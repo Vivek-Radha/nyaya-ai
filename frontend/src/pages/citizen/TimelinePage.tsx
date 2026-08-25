@@ -157,7 +157,7 @@ export default function TimelinePage() {
             </div>
           ) : (
             <div className="relative border-l-2 border-indigo-200 dark:border-indigo-900/50 ml-3 space-y-8 pb-8">
-              {events.map((e, idx) => (
+              {events.map((e) => (
                 <div key={e.id} className="relative pl-8 group">
                   <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full bg-indigo-500 border-4 border-zinc-50 dark:border-zinc-950"></div>
                   <div className="bg-white dark:bg-zinc-900/80 rounded-2xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow relative">

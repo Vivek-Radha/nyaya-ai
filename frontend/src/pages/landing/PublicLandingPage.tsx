@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Navbar } from '../../components/landing/Navbar';
 import { ArrowRight, Scale, Search, Shield, BookOpen, FileText, Clock, MessageSquare, ChevronRight } from 'lucide-react';
 import { useAuthGateStore } from '../../store/authGateStore';

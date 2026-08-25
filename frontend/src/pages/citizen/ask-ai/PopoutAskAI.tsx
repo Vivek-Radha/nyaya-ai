@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { useAskAIStore } from '../../../store/askAIStore';
 import { AskAIHeader } from './AskAIHeader';
 import { AskAIChatArea } from './AskAIChatArea';
@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export const PopoutAskAI: React.FC = () => {
   const { mode, isMaximized, position, dimensions, setPosition, setDimensions } = useAskAIStore();
-  const containerRef = useRef<HTMLDivElement>(null);
   
   // Handle resizing
   const startResize = (e: React.PointerEvent, direction: 'horizontal' | 'vertical' | 'both') => {

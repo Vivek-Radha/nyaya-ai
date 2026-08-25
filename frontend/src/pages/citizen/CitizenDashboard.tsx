@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { cn } from '../../lib/utils';
+
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { MessageSquare, Briefcase, ArrowRight, ShieldAlert, Zap, Scale, Trash2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';

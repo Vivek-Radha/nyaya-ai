@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
 import { useAuthStore } from '../../store/authStore';
 import { useTheme } from '../../components/ThemeProvider';
@@ -7,7 +7,7 @@ import { Button } from '../../components/ui/Button';
 import { User, Mail, Shield, Bell, Moon, Sun, Lock, Activity, Loader2, CheckCircle2 } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { user, token, setToken } = useAuthStore();
+  const { user, token, setToken, setUser } = useAuthStore();
   const { theme, setTheme } = useTheme();
   const { notificationsEnabled, setNotificationsEnabled } = useSettingsStore();
 
@@ -36,7 +36,8 @@ export default function ProfilePage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || 'Failed to update profile');
       
-      setToken(data.access_token, data.user);
+      setToken(data.access_token);
+      setUser(data.user);
       setSuccessMsg('Profile updated successfully!');
       setPassword('');
     } catch (err: any) {

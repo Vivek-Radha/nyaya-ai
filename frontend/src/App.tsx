@@ -7,7 +7,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import CitizenDashboard from './pages/citizen/CitizenDashboard';
-import PlaceholderPage from './pages/PlaceholderPage';
+
 import LawyerDashboard from './pages/lawyer/LawyerDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AskAIPage from './pages/citizen/AskAIPage';

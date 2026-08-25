@@ -27,7 +27,7 @@ export const FloatingAskAIWorkspace: React.FC = () => {
       reset(); // completely reset state (which also sets mode='embedded') on logout
     } else {
       // Check if this user has ever seen the initial popup
-      const userId = user.sub || user.id;
+      const userId = user.id;
       const key = `askAIState_${userId}`;
       const hasSeen = localStorage.getItem(key);
       

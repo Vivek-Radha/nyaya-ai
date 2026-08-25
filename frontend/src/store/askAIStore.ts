@@ -188,7 +188,7 @@ export const useAskAIStore = create<AskAIState>((set, get) => ({
   },
 
   handleFileUpload: async (files: FileList) => {
-    const { attachments, conversationId } = get();
+    const { attachments } = get();
     const token = useAuthStore.getState().token;
     
     const newFiles = Array.from(files);

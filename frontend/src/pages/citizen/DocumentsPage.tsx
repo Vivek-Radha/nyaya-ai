@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
-import { FileText, UploadCloud, Loader2, ShieldAlert, Trash2, Eye, Download } from 'lucide-react';
+import { FileText, UploadCloud, Loader2, Trash2, Eye, Download } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/authStore';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';

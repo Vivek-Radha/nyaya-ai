@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthGateStore } from '../../store/authGateStore';
-import { Scale, X, Mail, ArrowRight } from 'lucide-react';
+import { Scale, X, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../../store/authStore';

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DashboardLayout } from '../../layouts/DashboardLayout';
-import { Briefcase, Plus, ShieldAlert, Loader2, Trash2 } from 'lucide-react';
+import { Briefcase, Plus, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthStore } from '../../store/authStore';
