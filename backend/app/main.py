@@ -43,6 +43,26 @@ async def debug_env():
 def read_root():
     return {"message": "Welcome to NyayaAI API!"}
 
+@app.get("/debug_models")
+async def debug_models():
+    try:
+        from app.core.config import settings
+        from groq import Groq
+        import traceback
+        
+        if not settings.GROQ_API_KEY:
+            return {"error": "GROQ_API_KEY is empty in settings"}
+            
+        client = Groq(api_key=settings.GROQ_API_KEY)
+        models_response = client.models.list()
+        # models_response.data is a list of model objects
+        models = [m.id for m in models_response.data]
+        return {"status": "success", "models": models}
+    except Exception as e:
+        import traceback
+        return {"status": "error", "message": str(e), "traceback": traceback.format_exc()}
+
+
 # Include routers
 from app.api.auth import router as auth_router
 from app.api.ai import router as ai_router
