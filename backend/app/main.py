@@ -9,12 +9,11 @@ app = FastAPI(
 
 import os
 
-# CORS middleware
+# CORS middleware configuration
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://nyaya-ai-flame.vercel.app"
-    "https://nyaya-e4soa34ao-vivek-radhas-projects.vercel.app",
+    "https://nyaya-ai-flame.vercel.app",
 ]
 
 frontend_url = os.getenv("FRONTEND_URL")
@@ -30,9 +29,13 @@ if cors_origins_env:
         if clean_o and clean_o not in origins:
             origins.append(clean_o)
 
+# Safe regex pattern for Vercel preview deployments (e.g., https://nyaya-ai-*.vercel.app, https://nyaya-*-vivek-radhas-projects.vercel.app)
+origin_regex = r"^https:\/\/(nyaya-ai(-[a-zA-Z0-9_-]+)*|nyaya-[a-zA-Z0-9_-]+)\.vercel\.app$"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
