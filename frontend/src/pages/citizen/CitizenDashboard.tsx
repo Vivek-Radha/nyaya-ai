@@ -9,6 +9,7 @@ import { useAuthStore } from '../../store/authStore';
 import { useAskAIStore } from '../../store/askAIStore';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../../lib/api';
 
 export default function CitizenDashboard() {
   const navigate = useNavigate();
@@ -26,8 +27,7 @@ export default function CitizenDashboard() {
   useEffect(() => {
     const fetchConversations = async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-        const res = await fetch(`${baseUrl}/api/ai/conversations`, {
+        const res = await fetchWithTimeout(getApiUrl('/api/ai/conversations'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -54,8 +54,7 @@ export default function CitizenDashboard() {
   const handleDeleteChat = async (): Promise<boolean> => {
     if (!chatToDelete) return false;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/ai/conversations/${chatToDelete}`, {
+      const res = await fetchWithTimeout(getApiUrl(`/api/ai/conversations/${chatToDelete}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -74,7 +73,7 @@ export default function CitizenDashboard() {
       }
     } catch (err) {
       console.error(err);
-      setToast({ message: 'Unable to delete conversation. Please try again.', type: 'error' });
+      setToast({ message: formatApiError(err, 'Unable to delete conversation. Please try again.'), type: 'error' });
       return false;
     }
   };

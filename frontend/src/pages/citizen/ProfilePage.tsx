@@ -5,6 +5,7 @@ import { useTheme } from '../../components/ThemeProvider';
 import { useSettingsStore } from '../../store/settingsStore';
 import { Button } from '../../components/ui/Button';
 import { User, Mail, Shield, Bell, Moon, Sun, Lock, Activity, Loader2, CheckCircle2 } from 'lucide-react';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../../lib/api';
 
 export default function ProfilePage() {
   const { user, token, setToken, setUser } = useAuthStore();
@@ -22,7 +23,7 @@ export default function ProfilePage() {
     setSuccessMsg('');
     setErrorMsg('');
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}/api/auth/update_profile`, {
+      const response = await fetchWithTimeout(getApiUrl('/api/auth/update_profile'), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export default function ProfilePage() {
       setSuccessMsg('Profile updated successfully!');
       setPassword('');
     } catch (err: any) {
-      setErrorMsg(err.message);
+      setErrorMsg(formatApiError(err, 'Failed to update profile'));
     } finally {
       setLoading(false);
     }

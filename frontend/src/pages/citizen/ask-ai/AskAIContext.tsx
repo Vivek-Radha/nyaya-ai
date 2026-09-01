@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../../store/authStore';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../../../lib/api';
 
 export type ToolUsed = { tool_name: string, result_summary: string };
 export type AttachmentInfo = { file: File, id?: string, status: 'uploading' | 'ready' | 'error', error?: string };
@@ -70,8 +71,7 @@ export const AskAIProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const loadHistory = async () => {
         try {
           setLoading(true);
-          const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-          const res = await fetch(`${baseUrl}/api/ai/conversations/${conversationId}`, {
+          const res = await fetchWithTimeout(getApiUrl(`/api/ai/conversations/${conversationId}`), {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (res.ok) {
@@ -135,14 +135,13 @@ export const AskAIProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           formData.append('document_id', readyAttachments[0].id);
       }
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const response = await fetch(`${baseUrl}/api/ai/chat`, {
+      const response = await fetchWithTimeout(getApiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
         },
         body: formData
-      });
+      }, 90000);
       
       const data = await response.json();
       
@@ -168,11 +167,7 @@ export const AskAIProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       
     } catch (err: any) {
       console.error("AskAI Fetch Error:", err);
-      if (err instanceof TypeError && err.message === 'Failed to fetch') {
-        setError('Unable to connect to the NyayaAI server. The server might be down, or the document is too large.');
-      } else {
-        setError(err.message || 'An unexpected error occurred.');
-      }
+      setError(formatApiError(err, 'Unable to get AI response. Please try again.'));
     } finally {
       setLoading(false);
     }
@@ -194,21 +189,19 @@ export const AskAIProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setAttachments(prev => [...prev, ...newAttachments]);
     setError(null);
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-
     for (const att of newAttachments) {
       try {
         const formData = new FormData();
         formData.append('file', att.file);
         if (conversationId) formData.append('conversation_id', conversationId);
 
-        const response = await fetch(`${baseUrl}/api/ai/upload`, {
+        const response = await fetchWithTimeout(getApiUrl('/api/ai/upload'), {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
           },
           body: formData
-        });
+        }, 90000);
 
         const data = await response.json();
 
@@ -231,7 +224,7 @@ export const AskAIProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       } catch (err: any) {
         console.error("Upload error:", err);
         setAttachments(prev => prev.map(a => 
-            a.file === att.file ? { ...a, status: 'error', error: err.message } : a
+            a.file === att.file ? { ...a, status: 'error', error: formatApiError(err, 'Upload failed') } : a
         ));
       }
     }

@@ -6,6 +6,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../../store/authStore';
 import { Input } from './Input';
 import { Button } from './Button';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../../lib/api';
 
 export function AuthGateModal() {
   const { isOpen, closeAuthGate, returnTo, defaultMode } = useAuthGateStore();
@@ -45,10 +46,9 @@ export function AuthGateModal() {
     setError('');
     
     try {
-      const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
-      console.log("Backend authentication request sent to:", `${baseUrl}/api/auth/google`);
+      console.log("Backend authentication request sent to:", getApiUrl('/api/auth/google'));
       
-      const response = await fetch(`${baseUrl}/api/auth/google`, {
+      const response = await fetchWithTimeout(getApiUrl('/api/auth/google'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential })
@@ -70,11 +70,7 @@ export function AuthGateModal() {
       navigate(returnTo, { replace: true });
     } catch (err: unknown) {
       console.error("Authentication error caught:", err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(String(err));
-      }
+      setError(formatApiError(err, 'Google Sign-In failed. Please try again.'));
     }
     setLoading(false);
   };
@@ -95,10 +91,8 @@ export function AuthGateModal() {
     setLoading(true);
 
     try {
-      const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
-      
       if (mode === 'login') {
-        const response = await fetch(`${baseUrl}/api/auth/login`, {
+        const response = await fetchWithTimeout(getApiUrl('/api/auth/login'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -110,7 +104,7 @@ export function AuthGateModal() {
         useAuthStore.getState().setToken(data.access_token);
       } else {
         // Signup
-        const response = await fetch(`${baseUrl}/api/auth/signup`, {
+        const response = await fetchWithTimeout(getApiUrl('/api/auth/signup'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, full_name: fullName, role: 'citizen' })
@@ -126,13 +120,7 @@ export function AuthGateModal() {
       closeAuthGate();
       navigate(returnTo, { replace: true });
     } catch (err: unknown) {
-      if (err instanceof Error && err.name === 'TypeError' && err.message === 'Failed to fetch') {
-        setError('Cannot connect to the server. Please ensure the backend is running.');
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(String(err));
-      }
+      setError(formatApiError(err, 'Authentication failed. Please try again.'));
     }
     setLoading(false);
   };

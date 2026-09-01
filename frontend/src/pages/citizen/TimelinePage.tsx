@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthStore } from '../../store/authStore';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { getApiUrl, fetchWithTimeout } from '../../lib/api';
 
 export default function TimelinePage() {
   const { token } = useAuthStore();
@@ -24,8 +25,7 @@ export default function TimelinePage() {
   useEffect(() => {
     const fetchCases = async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-        const res = await fetch(`${baseUrl}/api/cases/`, {
+        const res = await fetchWithTimeout(getApiUrl('/api/cases/'), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -46,8 +46,7 @@ export default function TimelinePage() {
     if (!caseId) return;
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/timeline/${caseId}`, {
+      const res = await fetchWithTimeout(getApiUrl(`/api/timeline/${caseId}`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -72,8 +71,7 @@ export default function TimelinePage() {
     if (!newDesc.trim() || !newDate.trim() || !selectedCase) return;
     
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/timeline/`, {
+      const res = await fetchWithTimeout(getApiUrl('/api/timeline/'), {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -96,8 +94,7 @@ export default function TimelinePage() {
   const handleDelete = async (): Promise<boolean> => {
     if (!itemToDelete) return false;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/timeline/${itemToDelete}`, {
+      const res = await fetchWithTimeout(getApiUrl(`/api/timeline/${itemToDelete}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { useAuthStore } from './authStore';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../lib/api';
 
 export type ToolUsed = { tool_name: string, result_summary: string };
 export type AttachmentInfo = { file: File, id?: string, status: 'uploading' | 'ready' | 'error', error?: string };
@@ -144,14 +145,13 @@ export const useAskAIStore = create<AskAIState>((set, get) => ({
           formData.append('document_id', readyAttachments[0].id);
       }
 
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const response = await fetch(`${baseUrl}/api/ai/chat`, {
+      const response = await fetchWithTimeout(getApiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
         },
         body: formData
-      });
+      }, 90000);
       
       const data = await response.json();
       
@@ -177,11 +177,7 @@ export const useAskAIStore = create<AskAIState>((set, get) => ({
       
     } catch (err: any) {
       console.error("AskAI Fetch Error:", err);
-      if (err instanceof TypeError && err.message === 'Failed to fetch') {
-        set({ error: 'Unable to connect to the NyayaAI server. The server might be down, or the document is too large.' });
-      } else {
-        set({ error: err.message || 'An unexpected error occurred.' });
-      }
+      set({ error: formatApiError(err, 'Unable to get AI response. Please try again.') });
     } finally {
       set({ loading: false });
     }
@@ -208,8 +204,6 @@ export const useAskAIStore = create<AskAIState>((set, get) => ({
       error: null
     }));
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-
     for (const att of newAttachments) {
       try {
         const formData = new FormData();
@@ -218,13 +212,13 @@ export const useAskAIStore = create<AskAIState>((set, get) => ({
         const currentConversationId = get().conversationId;
         if (currentConversationId) formData.append('conversation_id', currentConversationId);
 
-        const response = await fetch(`${baseUrl}/api/ai/upload`, {
+        const response = await fetchWithTimeout(getApiUrl('/api/ai/upload'), {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
           },
           body: formData
-        });
+        }, 90000);
 
         const data = await response.json();
 
@@ -250,7 +244,7 @@ export const useAskAIStore = create<AskAIState>((set, get) => ({
         console.error("Upload error:", err);
         set((state) => ({
           attachments: state.attachments.map(a => 
-            a.file === att.file ? { ...a, status: 'error', error: err.message } : a
+            a.file === att.file ? { ...a, status: 'error', error: formatApiError(err, 'Upload failed') } : a
           )
         }));
       }

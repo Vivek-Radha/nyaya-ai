@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useAuthStore } from '../../store/authStore';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
+import { getApiUrl, fetchWithTimeout } from '../../lib/api';
 
 export default function JudgmentsPage() {
   const { token } = useAuthStore();
@@ -23,8 +24,7 @@ export default function JudgmentsPage() {
   const fetchJudgments = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/judgments/`, {
+      const res = await fetchWithTimeout(getApiUrl('/api/judgments/'), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -47,8 +47,7 @@ export default function JudgmentsPage() {
     if (!newTitle.trim()) return;
     
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/judgments/`, {
+      const res = await fetchWithTimeout(getApiUrl('/api/judgments/'), {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -72,8 +71,7 @@ export default function JudgmentsPage() {
   const handleDelete = async (): Promise<boolean> => {
     if (!itemToDelete) return false;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/judgments/${itemToDelete}`, {
+      const res = await fetchWithTimeout(getApiUrl(`/api/judgments/${itemToDelete}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

@@ -7,13 +7,31 @@ app = FastAPI(
     version="1.0.0"
 )
 
+import os
+
 # CORS middleware
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://nyaya-ai-flame.vercel.app",
+]
+
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    clean_frontend_url = frontend_url.strip().rstrip("/")
+    if clean_frontend_url and clean_frontend_url not in origins:
+        origins.append(clean_frontend_url)
+
+cors_origins_env = os.getenv("CORS_ORIGINS")
+if cors_origins_env:
+    for o in cors_origins_env.split(","):
+        clean_o = o.strip().rstrip("/")
+        if clean_o and clean_o not in origins:
+            origins.append(clean_o)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173"
-    ],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

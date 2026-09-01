@@ -5,6 +5,7 @@ import { Input } from '../../components/ui/Input';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuthStore } from '../../store/authStore';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../../lib/api';
 
 export default function LoginPage() {
   const location = useLocation();
@@ -32,8 +33,7 @@ export default function LoginPage() {
     setError('');
     
     try {
-      const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
-      const response = await fetch(`${baseUrl}/api/auth/login`, {
+      const response = await fetchWithTimeout(getApiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -49,13 +49,7 @@ export default function LoginPage() {
       await useAuthStore.getState().initialize();
       navigate(from, { replace: true });
     } catch (err: unknown) {
-      if (err instanceof Error && err.name === 'TypeError' && err.message === 'Failed to fetch') {
-        setError('Cannot connect to the server. Please ensure the backend is running.');
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(String(err));
-      }
+      setError(formatApiError(err, 'Login failed. Please try again.'));
     }
     
     setLoading(false);
@@ -66,8 +60,7 @@ export default function LoginPage() {
     setError('');
     
     try {
-      const baseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
-      const response = await fetch(`${baseUrl}/api/auth/google`, {
+      const response = await fetchWithTimeout(getApiUrl('/api/auth/google'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential })
@@ -83,11 +76,7 @@ export default function LoginPage() {
       await useAuthStore.getState().initialize();
       navigate(from, { replace: true });
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError(String(err));
-      }
+      setError(formatApiError(err, 'Google Sign-In failed. Please try again.'));
     }
     
     setLoading(false);

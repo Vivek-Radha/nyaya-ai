@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, FileText, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from './Button';
+import { getApiUrl, formatApiError, fetchWithTimeout } from '../../lib/api';
 
 interface DocumentViewerProps {
   isOpen: boolean;
@@ -37,8 +38,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
       setLoading(true);
       setError(null);
       try {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-        const res = await fetch(`${baseUrl}/api/documents/${documentId}/view`, {
+        const res = await fetchWithTimeout(getApiUrl(`/api/documents/${documentId}/view`), {
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -51,7 +51,7 @@ export const DocumentViewer: React.FC<DocumentViewerProps> = ({
         setObjectUrl(url);
       } catch (err) {
         console.error("Error fetching document:", err);
-        setError("Could not load the document. It may have been deleted or you don't have permission.");
+        setError(formatApiError(err, "Could not load the document. It may have been deleted or you don't have permission."));
       } finally {
         setLoading(false);
       }

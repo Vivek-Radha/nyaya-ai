@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/authStore';
 import { DeleteConfirmationModal } from '../../components/ui/DeleteConfirmationModal';
 import { DocumentViewer } from '../../components/ui/DocumentViewer';
+import { getApiUrl, fetchWithTimeout } from '../../lib/api';
 
 export default function DocumentsPage() {
   const { token } = useAuthStore();
@@ -23,8 +24,7 @@ export default function DocumentsPage() {
   const fetchDocuments = async () => {
     try {
       setLoading(true);
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/documents/`, {
+      const res = await fetchWithTimeout(getApiUrl('/api/documents/'), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -47,7 +47,6 @@ export default function DocumentsPage() {
     if (!files || files.length === 0) return;
     
     setUploading(true);
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
     
     for (const file of Array.from(files)) {
       try {
@@ -55,11 +54,11 @@ export default function DocumentsPage() {
         formData.append('file', file);
         
         // We use the existing AI upload endpoint so it gets processed by OCR/Text extraction
-        await fetch(`${baseUrl}/api/ai/upload`, {
+        await fetchWithTimeout(getApiUrl('/api/ai/upload'), {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` },
           body: formData
-        });
+        }, 90000);
       } catch (err) {
         console.error("Failed to upload", err);
       }
@@ -73,8 +72,7 @@ export default function DocumentsPage() {
   const handleDelete = async (): Promise<boolean> => {
     if (!itemToDelete) return false;
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/documents/${itemToDelete}`, {
+      const res = await fetchWithTimeout(getApiUrl(`/api/documents/${itemToDelete}`), {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -92,8 +90,7 @@ export default function DocumentsPage() {
   const handleCardDownload = async (e: React.MouseEvent, docId: string, filename: string) => {
     e.stopPropagation();
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
-      const res = await fetch(`${baseUrl}/api/documents/${docId}/view?download=true`, {
+      const res = await fetchWithTimeout(getApiUrl(`/api/documents/${docId}/view?download=true`), {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
