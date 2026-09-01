@@ -2,9 +2,9 @@
  * Centralized API configuration and request helpers for NyayaAI.
  */
 
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
 
-// In production, use VITE_API_BASE_URL without trailing slash.
+// In production, use configured API base URL without trailing slash.
 // In local development, fallback to http://localhost:8000 if not specified.
 export const API_BASE_URL = (rawBaseUrl && rawBaseUrl.trim())
   ? rawBaseUrl.trim().replace(/\/$/, '')
