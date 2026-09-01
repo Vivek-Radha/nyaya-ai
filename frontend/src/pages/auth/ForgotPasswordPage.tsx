@@ -15,9 +15,7 @@ export default function ForgotPasswordPage() {
     setError('');
     setMessage('');
     
-    // const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    //   redirectTo: `${window.location.origin}/reset-password`,
-    // });
+
     const error = { message: "Password reset is not implemented yet." };
     
     if (error) {
