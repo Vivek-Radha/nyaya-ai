@@ -13,7 +13,8 @@ import os
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://nyaya-ai-flame.vercel.app",
+    "https://nyaya-ai-flame.vercel.app"
+    "https://nyaya-e4soa34ao-vivek-radhas-projects.vercel.app",
 ]
 
 frontend_url = os.getenv("FRONTEND_URL")
