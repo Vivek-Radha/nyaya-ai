@@ -50,9 +50,9 @@ export default function LoginPage() {
       navigate(from, { replace: true });
     } catch (err: unknown) {
       setError(formatApiError(err, 'Login failed. Please try again.'));
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
@@ -60,6 +60,10 @@ export default function LoginPage() {
     setError('');
     
     try {
+      if (!credentialResponse.credential) {
+        throw new Error('No credential received from Google');
+      }
+
       const response = await fetchWithTimeout(getApiUrl('/api/auth/google'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,9 +81,9 @@ export default function LoginPage() {
       navigate(from, { replace: true });
     } catch (err: unknown) {
       setError(formatApiError(err, 'Google Sign-In failed. Please try again.'));
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -138,7 +142,8 @@ export default function LoginPage() {
             onError={() => {
               setError('Google Login Failed');
             }}
-            useOneTap
+            useOneTap={false}
+            width="320"
           />
         </div>
       </div>

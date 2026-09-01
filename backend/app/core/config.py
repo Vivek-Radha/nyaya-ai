@@ -15,7 +15,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7 # 7 days
     
     # Database
-    MONGODB_URL: str = "mongodb://localhost:27017"
+    MONGODB_URL: str = ""
+    DATABASE_URL: str = ""
     DATABASE_NAME: str = "nyaya_ai"
     
     # 3rd Party APIs

@@ -8,6 +8,22 @@ app = FastAPI(
 )
 
 import os
+import logging
+import traceback
+from fastapi import Request, status
+from fastapi.responses import JSONResponse
+
+logger = logging.getLogger("main")
+logging.basicConfig(level=logging.INFO)
+
+# Global exception handler ensures ANY 500 error returns a proper JSONResponse that passes through CORSMiddleware
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception on {request.method} {request.url}: {type(exc).__name__}: {exc}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal server error occurred. Please check backend server logs."}
+    )
 
 # CORS middleware configuration
 origins = [
